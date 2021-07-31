@@ -90,11 +90,11 @@ if not log_root.handlers:
     log_root.setLevel(logging.DEBUG)
 
 
-def get_logger(name='rootpy.tree'):
+def get_logger(name='user'):
     log = logging.getLogger(name)
     if not os.environ.get('DEBUG', False):
         log.setLevel(logging.INFO)
     return log
 
 
-log = get_logger()
+log = get_logger('tree')
