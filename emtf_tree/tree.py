@@ -27,6 +27,8 @@ class BaseTree(object):
     def __init__(self, tree,
                  read_branches_on_demand=False,
                  always_read=None):
+        if not hasattr(tree, '__iter__') or not hasattr(tree, '__contains__'):
+            raise RuntimeError("unable to initialize Tree")
         self._tree = tree
         # only set _buffer if it does not exist
         if not hasattr(self, '_buffer'):
@@ -38,25 +40,7 @@ class BaseTree(object):
             self._always_read = always_read
         #self._branch_cache = {}
         #self._current_entry = 0
-        self.__extra_init()
         self._inited = True  # affects __setattr__ and __getattr__ behaviors
-
-    def __extra_init(self):
-        # Borrow certain functions from TTree
-        self.GetBranch = self._tree.GetBranch
-        self.GetBranchStatus = self._tree.GetBranchStatus
-        self.GetListOfBranches = self._tree.GetListOfBranches
-        self.GetEntry = self._tree.GetEntry
-        self.GetEntries = self._tree.GetEntries
-        self.GetEntriesFast = self._tree.GetEntriesFast
-        self.GetWeight = self._tree.GetWeight
-        self.SetBranchAddress = self._tree.SetBranchAddress
-        self.SetBranchStatus = self._tree.SetBranchStatus
-        self.SetCacheSize = self._tree.SetCacheSize
-        self.SetCacheLearnEntries = self._tree.SetCacheLearnEntries
-        self.AddBranchToCache = self._tree.AddBranchToCache
-        self.DropBranchFromCache = self._tree.DropBranchFromCache
-        self.PrintCacheStats = self._tree.PrintCacheStats
 
     @classmethod
     def branch_type(cls, branch):
@@ -375,9 +359,12 @@ class BaseTree(object):
         try:
             return getattr(self._buffer, attr)
         except AttributeError:
-            raise AttributeError(
-                "`{0}` instance has no attribute `{1}`".format(
-                    self.__class__.__name__, attr))
+            try:
+                return getattr(self._tree, attr)
+            except AttributeError:
+                raise AttributeError(
+                    "`{0}` instance has no attribute `{1}`".format(
+                        self.__class__.__name__, attr))
 
     def __len__(self):
         """
