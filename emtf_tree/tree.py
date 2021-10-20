@@ -39,7 +39,6 @@ class BaseTree(object):
         else:
             self._always_read = always_read
         #self._branch_cache = {}
-        #self._current_entry = 0
         self._inited = True  # affects __setattr__ and __getattr__ behaviors
 
     @classmethod
@@ -194,7 +193,7 @@ class BaseTree(object):
             branches = [branches]
         for branch in branches:
             if '*' in branch:
-                matched_branches = self.glob(branch)
+                matched_branches = self._glob(branch)
                 for b in matched_branches:
                     self.SetBranchStatus(b, 1)
             elif self.has_branch(branch):
@@ -218,7 +217,7 @@ class BaseTree(object):
             branches = [branches]
         for branch in branches:
             if '*' in branch:
-                matched_branches = self.glob(branch)
+                matched_branches = self._glob(branch)
                 for b in matched_branches:
                     self.SetBranchStatus(b, 0)
             elif self.has_branch(branch):
@@ -252,7 +251,7 @@ class BaseTree(object):
         for branch in self.iterbranches():
             yield branch.GetName()
 
-    def glob(self, patterns, exclude=None):
+    def _glob(self, patterns, exclude=None):
         """
         Return a list of branch names that match ``pattern``.
         Exclude all matched branch names which also match a pattern in
@@ -314,7 +313,6 @@ class BaseTree(object):
                 # Only increment current entry.
                 # getattr on a branch will then GetEntry on only that branch
                 # see ``TreeBuffer.get_with_read_if_cached``.
-                self._current_entry = i
                 self.LoadTree(i)
                 for attr in self._always_read:
                     # Always read branched in ``self._always_read`` since

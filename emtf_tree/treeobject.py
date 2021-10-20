@@ -104,8 +104,8 @@ class TreeCollection(object):
         self.size = size
         self.selection = None
 
-        self.__cache_objects = cache
-        self.__cache = {}
+        self._use_cache = cache
+        self._cache = {}
         # A TreeCollectionObject is constructed on-the-fly and cached for reuse
         self.tree_object_cls = TreeCollectionObject
 
@@ -122,7 +122,7 @@ class TreeCollection(object):
         self.selection = None
 
     def reset_cache(self):
-        self.__cache = {}
+        self._cache = {}
 
     def remove(self, thing):
         if self.selection is None:
@@ -196,11 +196,11 @@ class TreeCollection(object):
                 "index {0:d} out of range for "
                 "collection `{1}` of size {2:d}".format(
                     self.index, self.name, len(self)))
-        if self.__cache_objects and index in self.__cache:
-            return self.__cache[index]
+        if self._use_cache and index in self._cache:
+            return self._cache[index]
         obj = self.tree_object_cls(self.tree, self.name, self.prefix, index)
-        if self.__cache_objects:
-            self.__cache[index] = obj
+        if self._use_cache:
+            self._cache[index] = obj
         return obj
 
     def __getitem__(self, index):
@@ -213,18 +213,12 @@ class TreeCollection(object):
                     self.index, self.name, len(self)))
         if self.selection is not None:
             index = self.selection[index]
-        if self.__cache_objects and index in self.__cache:
-            return self.__cache[index]
+        if self._use_cache and index in self._cache:
+            return self._cache[index]
         obj = self.tree_object_cls(self.tree, self.name, self.prefix, index)
-        if self.__cache_objects:
-            self.__cache[index] = obj
+        if self._use_cache:
+            self._cache[index] = obj
         return obj
-
-    def len(self):
-        """
-        length of original collection
-        """
-        return getattr(self.tree, self.size)
 
     def __len__(self):
         if self.selection is not None:

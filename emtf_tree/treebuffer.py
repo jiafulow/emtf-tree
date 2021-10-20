@@ -42,17 +42,16 @@ class TreeBuffer(OrderedDict):
         self._collections = {}
         self._objects = []
         self._entry = Int(0)  # is this actually needed?
-        self.__process(branches)
+        self._process_branches(branches)
         self._inited = True  # affects __setattr__ and __getattr__ behaviors
 
-    @classmethod
-    def __clean(cls, branchname):
+    def _fix_name(self, branchname):
         # Replace invalid characters with '_'
         branchname = re.sub('[^0-9a-zA-Z_]', '_', branchname)
         # Remove leading characters until we find a letter or underscore
         return re.sub('^[^a-zA-Z_]+', '', branchname)
 
-    def __process(self, branches):
+    def _process_branches(self, branches):
         if not branches:
             return
         if not isinstance(branches, dict):
@@ -170,7 +169,7 @@ class TreeBuffer(OrderedDict):
 
     def __setitem__(self, name, value):
         # for a key to be used as an attr it must be a valid Python identifier
-        fixed_name = TreeBuffer.__clean(name)
+        fixed_name = self._fix_name(name)
         if fixed_name in dir(self) or fixed_name.startswith('_'):
             raise ValueError("illegal branch name: `{0}`".format(name))
         if fixed_name != name:

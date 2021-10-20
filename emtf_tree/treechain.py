@@ -49,14 +49,15 @@ class BaseTreeChain(object):
         self._file = None
         self._events = events
         self._total_events = 0
+
+        if onfilechange is None:
+            onfilechange = []
+        self._filechange_hooks = onfilechange
         self._ignore_unsupported = ignore_unsupported
         if filters is None:
             self._filters = EventFilterList([])
         else:
             self._filters = filters
-        if onfilechange is None:
-            onfilechange = []
-        self._filechange_hooks = onfilechange
 
         self._read_branches_on_demand = read_branches_on_demand
         self._use_cache = cache
@@ -107,7 +108,7 @@ class BaseTreeChain(object):
 
     def __iter__(self):
         passed_events = 0
-        self.reset()
+        self.reset()  # needed to reset the first _rollover() call during __init__()
         while self._rollover():
             entries = 0
             total_entries = float(self._tree.GetEntries())
@@ -121,14 +122,14 @@ class BaseTreeChain(object):
                     if self._events == passed_events:
                         break
                 if time.time() - t2 > 60:
-                    entry_rate = int(entries / (time.time() - t1))
+                    t2 = time.time()
+                    entry_rate = int(entries / (t2 - t1))
                     log.info(
                         "{0:d} entr{1} per second. "
                         "{2:.0f}% done current tree.".format(
                             entry_rate,
                             'ies' if entry_rate != 1 else 'y',
                             100 * entries / total_entries))
-                    t2 = time.time()
             if self._events == passed_events:
                 break
             log.info("{0:d} entries per second".format(
@@ -296,6 +297,9 @@ class TreeQueue(BaseTreeChain):
             self._seen_files.append(filename)
         else:
             filename = self._seen_files[self._curr_file_idx]
+        log.info("{0:d} file{1} seen".format(
+            len(self._seen_files),
+            's' if len(self._seen_files) > 1 else ''))
         self._curr_file_idx += 1
         return filename
 
