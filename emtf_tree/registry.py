@@ -44,11 +44,6 @@ def lookup_by_name(cls_name):
     return None
 
 
-def lookup(cls):
-    cls_name = cls.__name__
-    return lookup_by_name(cls_name)
-
-
 def create(cls_name, *args, **kwargs):
     cls = getattr(ROOT, cls_name, None)
     if cls is None:

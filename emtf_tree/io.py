@@ -17,6 +17,10 @@ import os
 from .defaults import ROOT, log
 
 
+def _expand_path(s):
+    return os.path.expanduser(os.path.expandvars(s))
+
+
 def root_open(filename, mode=''):
     """
     Open a ROOT file via ROOT's static ROOT.TFile.Open [1] function and return
@@ -58,7 +62,7 @@ def root_open(filename, mode=''):
     if mode in mode_map:
         mode = mode_map[mode]
 
-    filename = expand_path(filename)
+    filename = _expand_path(filename)
     log.debug("Opening file '{0}'".format(filename))
     root_file = ROOT.TFile.Open(filename, mode)
     if not root_file:
@@ -74,7 +78,3 @@ class DoesNotExist(Exception):
     that does not exist in a directory.
     """
     pass
-
-
-def expand_path(s):
-    return os.path.expanduser(os.path.expandvars(s))

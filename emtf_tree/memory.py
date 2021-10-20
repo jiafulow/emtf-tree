@@ -7,7 +7,7 @@
 #
 # Please refer to LICENSE.rootpy for the license terms.
 # ==============================================================================
-"""This module."""
+"""This module provides the function to keep objects alive."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -18,7 +18,6 @@ import weakref
 from .defaults import log
 
 KEEPALIVE = weakref.WeakKeyDictionary()
-DISABLED = 'NO_ROOTPY_KEEPALIVE' in os.environ
 
 
 def hashable(v):
@@ -35,7 +34,7 @@ def keepalive(nurse, *patients):
     Keep ``patients`` alive at least as long as ``nurse`` is around using a
     ``WeakKeyDictionary``.
     """
-    if DISABLED:
+    if os.environ.get('NO_ROOTPY_KEEPALIVE', False):
         return
     if hashable(nurse):
         hashable_patients = []

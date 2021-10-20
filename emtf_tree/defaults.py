@@ -16,20 +16,18 @@ from __future__ import print_function
 import os
 from collections import namedtuple
 
-import ROOT
-
 from .logger import log
 
-initialized = False
+try:
+    import ROOT
+except ImportError:
+    raise ImportError('Could not import ROOT')
 
 
 def configure_defaults():
     """
     This function is executed immediately after ROOT's finalSetup
     """
-    global initialized
-    initialized = True
-
     if not os.environ.get('NO_ROOTPY_BATCH', False):
         ROOT.gROOT.SetBatch(True)
         log.debug("ROOT is running in batch mode")
@@ -60,7 +58,6 @@ class ROOTVersion(namedtuple('_ROOTVersionBase',
 
 
 ROOT_VERSION = ROOTVersion(ROOT.gROOT.GetVersionInt())
-log.debug("Using ROOT {0}".format(ROOT_VERSION))
 
 
 class ROOTError(RuntimeError):

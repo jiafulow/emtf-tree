@@ -20,11 +20,11 @@ import os
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
 COLORS = {
-    'DEBUG'      : BLUE,
-    'INFO'       : WHITE,
-    'WARNING'    : YELLOW,
-    'ERROR'      : RED,
-    'CRITICAL'   : RED,
+    'DEBUG': BLUE,
+    'INFO': WHITE,
+    'WARNING': YELLOW,
+    'ERROR': RED,
+    'CRITICAL': RED,
 }
 
 # These are the sequences need to get colored ouput
@@ -92,7 +92,7 @@ if not log_root.handlers:
 
 def get_logger(name='user'):
     log = logging.getLogger(name)
-    if not os.environ.get('DEBUG', False):
+    if not os.environ.get('ROOTPY_DEBUG', False):
         log.setLevel(logging.INFO)
     return log
 
